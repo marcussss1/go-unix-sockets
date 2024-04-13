@@ -1,14 +1,15 @@
 package scheduler
 
-//
 //func (s *Scheduler) Start() {
 //	for {
-//		//for task := range s.Tasks {
-//		//	s.Workers <- task
-//		//}
-//		//select {
-//		//case worker := <-s.Workers:
-//		//	worker.Work()
-//		//}
+//		select {
+//		case task := <-s.Tasks:
+//			s.Workers <- worker.Worker{
+//				EpollFD:  task.EpollFD,
+//				ClientFD: task.ClientFD,
+//			}
+//		default:
+//			time.Sleep(100 * time.Millisecond)
+//		}
 //	}
 //}

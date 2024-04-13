@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"golang.org/x/sys/unix"
+	"my-server/scheduler"
 	"my-server/utils"
 	"os"
 	"os/signal"
@@ -15,10 +16,10 @@ type Server struct {
 	EpollFD         int
 	ClientSocketFDs map[int]int
 	Signals         chan os.Signal
-	//Scheduler       *scheduler.Scheduler
+	Scheduler       *scheduler.Scheduler
 }
 
-func New(port int, addr [4]byte) (*Server, error) {
+func New(port int, addr [4]byte, countWorkers int) (*Server, error) {
 	serverFD, err := newServerSocket(port, addr)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
@@ -32,15 +33,22 @@ func New(port int, addr [4]byte) (*Server, error) {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT)
 
+	sch := scheduler.New(countWorkers)
+	wg := &sync.WaitGroup{}
+	//wg.Add(1)
+	//go func() {
+	//	sch.Start()
+	//}()
+	//wg.Wait()
+
 	srv := &Server{
 		ServerFD:        serverFD,
 		EpollFD:         epollFD,
 		ClientSocketFDs: make(map[int]int),
 		Signals:         signals,
-		//Scheduler:       nil,
+		Scheduler:       sch,
 	}
 
-	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go catchSignal(wg, srv)
 	wg.Wait()

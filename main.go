@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	srv, err := server.New(8321, [4]byte{127, 0, 0, 1})
+	srv, err := server.New(8321, [4]byte{127, 0, 0, 1}, 5)
 	if err != nil {
 		log.Fatal(fmt.Errorf("create server: %w", err))
 	}
@@ -21,8 +21,8 @@ func main() {
 	wg.Wait()
 
 	wg.Add(2)
-	go cliSend(wg, []string{"1"})
-	go cliSend(wg, []string{"2"})
+	go cliSend(wg, []string{"1"}, 5)
+	go cliSend(wg, []string{"2"}, 5)
 	wg.Wait()
 }
 
@@ -32,14 +32,14 @@ func startServer(wg *sync.WaitGroup, srv *server.Server) {
 	fmt.Println(err)
 }
 
-func cliSend(wg *sync.WaitGroup, msgs []string) {
+func cliSend(wg *sync.WaitGroup, msgs []string, countRequests int) {
 	defer wg.Done()
 
 	mx := &sync.Mutex{}
 	wg2 := &sync.WaitGroup{}
-	wg2.Add(5)
+	wg2.Add(countRequests)
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < countRequests; i++ {
 		go func() {
 			defer wg2.Done()
 			defer mx.Unlock()
