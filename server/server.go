@@ -35,11 +35,12 @@ func New(port int, addr [4]byte, countWorkers int) (*Server, error) {
 
 	sch := scheduler.New(countWorkers)
 	wg := &sync.WaitGroup{}
-	//wg.Add(1)
-	//go func() {
-	//	sch.Start()
-	//}()
-	//wg.Wait()
+	wg.Add(1)
+	go func() {
+		wg.Done()
+		sch.Start()
+	}()
+	wg.Wait()
 
 	srv := &Server{
 		ServerFD:        serverFD,

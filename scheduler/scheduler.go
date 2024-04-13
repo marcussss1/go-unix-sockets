@@ -1,44 +1,21 @@
 package scheduler
 
 import (
-	"fmt"
+	"my-server/task"
 	"my-server/worker"
-	"sync"
-	"time"
 )
 
 type Scheduler struct {
-	Tasks   chan Task
-	Workers chan worker.Worker
+	CountWorkers int
+	Tasks        chan task.Task
+	Workers      chan worker.Worker
 }
 
 func New(countWorkers int) *Scheduler {
-	workers := make(chan worker.Worker, countWorkers)
-	wg := &sync.WaitGroup{}
-	wg.Add(countWorkers)
-
-	for countWorker := 0; countWorker < countWorkers; countWorker++ {
-		go func() {
-			wg.Done()
-			for {
-				select {
-				case wrk := <-workers:
-					err := wrk.Work()
-					if err != nil {
-						fmt.Printf("server start: work: %v\n", err)
-					}
-				default:
-					time.Sleep(100 * time.Millisecond)
-				}
-			}
-		}()
-	}
-
-	wg.Wait()
-
 	return &Scheduler{
-		Tasks:   make(chan Task, 1024),
-		Workers: workers,
+		CountWorkers: countWorkers,
+		Tasks:        make(chan task.Task, 1024),
+		Workers:      make(chan worker.Worker, countWorkers),
 	}
 }
 

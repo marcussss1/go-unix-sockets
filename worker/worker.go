@@ -1,6 +1,7 @@
 package worker
 
+import "my-server/task"
+
 type Worker struct {
-	EpollFD  int
-	ClientFD int
+	Task task.Task
 }
