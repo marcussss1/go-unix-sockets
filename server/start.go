@@ -21,11 +21,6 @@ func (s *Server) Start() error {
 					return fmt.Errorf("server start: accept unix socket: %w", err)
 				}
 
-				err = unix.SetNonblock(fd, true)
-				if err != nil {
-					return fmt.Errorf("server start: set noblock: %w", err)
-				}
-
 				err = unix.EpollCtl(s.EpollFD, unix.EPOLL_CTL_ADD, clientFD, &unix.EpollEvent{
 					Events: unix.EPOLLIN | unix.EPOLLET,
 					Fd:     int32(clientFD),

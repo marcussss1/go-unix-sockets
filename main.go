@@ -21,8 +21,8 @@ func main() {
 	wg.Wait()
 
 	wg.Add(2)
-	go cliSend(wg, []string{"1"}, 5)
-	go cliSend(wg, []string{"2"}, 5)
+	go cliSend(wg, []string{"1"}, 500)
+	go cliSend(wg, []string{"2"}, 500)
 	wg.Wait()
 }
 
